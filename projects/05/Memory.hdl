@@ -29,44 +29,55 @@ CHIP Memory {
     PARTS:
     // Put your code here:
 
+    DMux4Way(in=load,sel=address[13..14],a=loadram1,b=loadram2,c=loadscreen,d=loadkb);
+    Or(a=loadram1,b=loadram2,out=loadram);
+    RAM16K(in=in,load=loadram,address=address[0..13],out=ramout);
+    Screen(in=in,load=loadscreen,address=address[0..12],out=scrout);
+    Keyboard(out=kbout);
+    Mux4Way16(a=ramout,b=ramout,c=scrout,d=kbout,sel=address[13..14],out=out);
+
+
+
+
+
     //Zero
-    Not16(in=in,out=make0);
-    And16(a=in,b=make0,out=Zero);
-    Not16(in=Zero,out=One);
-    Or16(a=Zero,b[0..14]=address,b[15]=false,out=address16);
+    //Not16(in=in,out=make0);
+    //And16(a=in,b=make0,out=Zero);
+    //Not16(in=Zero,out=One);
+    //Or16(a=Zero,b[0..14]=address,b[15]=false,out=address16);
     
     //V24576
-    ALU(x=in,y[15]=false,y[13..14]=true,y[0..12]=false,zx=true,nx=false,zy=false,ny=false,f=true,no=false,out=V24576,zr=zr0,ng=ng0);
+    //ALU(x=in,y[15]=false,y[13..14]=true,y[0..12]=false,zx=true,nx=false,zy=false,ny=false,f=true,no=false,out=V24576,zr=zr0,ng=ng0);
     //ST24576(Smaller Than 24576)
     //EQ24576(EQual 24576)
     //address-24576
-    ALU(x=address16,y=V24576,zx=false,nx=false,zy=false,ny=true,f=true,no=false,out=GT24576,zr=EQ24576,ng=ST24576);
+    //ALU(x=address16,y=V24576,zx=false,nx=false,zy=false,ny=true,f=true,no=false,out=GT24576,zr=EQ24576,ng=ST24576);
     //if ST24576 out=One
     //Mux16(a=address16,b=One,sel=ST24576,out=r1);
 
     
     //V16384
-    ALU(x=in,y[15]=false,y[0..13]=false,y[14]=true,zx=true,nx=false,zy=false,ny=false,f=true,no=false,out=V16384,zr=zr1,ng=ng1);
+    //ALU(x=in,y[15]=false,y[0..13]=false,y[14]=true,zx=true,nx=false,zy=false,ny=false,f=true,no=false,out=V16384,zr=zr1,ng=ng1);
     //
-    ALU(x=address16,y=V16384,zx=false,nx=false,zy=false,ny=true,f=true,no=false,out[0..11]=hoge,out[12..15]=huga,zr=EQ16384,ng=ST16384);
+    //ALU(x=address16,y=V16384,zx=false,nx=false,zy=false,ny=true,f=true,no=false,out[0..11]=hoge,out[12..15]=huga,zr=EQ16384,ng=ST16384);
 
 
     //invalid(address>24576)    
-    Not(in=ST24576,out=invalid);
+    //Not(in=ST24576,out=invalid);
     //keyboard(address==24576)
-    And(a=EQ24576,b=true,out=keyboard);
+    //And(a=EQ24576,b=true,out=keyboard);
     //screen(16384<=address<24576)
-    Not(in=ST16384,out=GT16384);
-    Or(a=GT16384,b=EQ16384,out=GET16384);
-    And(a=ST24576,b=GET16384,out=screen);
+    //Not(in=ST16384,out=GT16384);
+    //Or(a=GT16384,b=EQ16384,out=GET16384);
+    //And(a=ST24576,b=GET16384,out=screen);
     //ram
-    And(a=ST16384,b=true,out=ram);
+    //And(a=ST16384,b=true,out=ram);
 
-    And(a=load,b=ram,out=loadram);
-    And(a=load,b=screen,out=loadscreen);
-    RAM16K(in=in,load=loadram,address=address[0..13],out=VRAM);
-    Screen(in=in,load=loadscreen,address=address[0..12],out=VSCREEN0);
-    Keyboard(out=VKEYBOARD);
+    //And(a=load,b=ram,out=loadram);
+    //And(a=load,b=screen,out=loadscreen);
+    //RAM16K(in=in,load=loadram,address=address[0..13],out=VRAM);
+    //Screen(in=in,load=loadscreen,address=address[0..12],out=VSCREEN0);
+    //Keyboard(out=VKEYBOARD);
     
 
 
@@ -81,9 +92,9 @@ CHIP Memory {
     //RAM4K(in=in,load=loadscreen2,address=unchi,out=screen2);//Screen2
     //Mux16(a=screen2,b=screen1,sel=ST20480,out=VSCREEN);
     
-    Or(a=screen,b=invalid,out=sel0);
-    Or(a=keyboard,b=invalid,out=sel1);
+    //Or(a=screen,b=invalid,out=sel0);
+    //Or(a=keyboard,b=invalid,out=sel1);
     //out
-    Mux4Way16(a=VRAM,b=VSCREEN0,c=VKEYBOARD,d=Zero,sel[0]=sel0,sel[1]=sel1,out=out);
+    //Mux4Way16(a=VRAM,b=VSCREEN0,c=VKEYBOARD,d=Zero,sel[0]=sel0,sel[1]=sel1,out=out);
 
 }
