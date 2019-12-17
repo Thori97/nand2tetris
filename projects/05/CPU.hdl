@@ -40,4 +40,50 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    //InstA     0vvv vvvv vvvv vvvv
+    //          A<=V
+
+    //InstC     111a cccc ccdd djjj
+    //        
+
+    //ALU
+    //input OutDReg OutAReg inM instruction
+    //output ALUResult
+    ALU(x=OutDReg,y=AorM,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],
+    out=ALUResult,zr=zero,ng=nega);
+    Mux16(a=OutAReg,b=inM,sel=instruction[12],out=AorM);
+
+    //ARegister
+    //in ALUResult, instruciton
+    //out OutAReg  
+    And(a=Instruction[5],b=instruction[15],out=loadAFromALU);
+    Mux16(a[0..14]=instruction[0..14],a[15]=false,b=ALUResult,sel=instruction[15], out=InARegValue);
+    Not(in=instruction[15],out=loadFromImm);
+    Or(a=loadAFromALU,b=loadFromImm,out=loadA);
+    ARegister(in=InARegValue,load=loadA,out=OutAReg);
+
+    //writeM
+    //in instruction    out writeM
+    And(a=instruction[3],b=true,out=writeM);
+
+    //DRegister
+    //input ALUResult
+    //output OutDReg
+    DRegister(in=ALUResult,load=instruction[4],out=OutDReg);
+
+    //PC
+    //input reset jump OutAReg
+    //output pc
+    PC(in=OutAReg,load=jump,inc=true,reset=reset,out[0..14]=pc);
+
+    //jump
+    //input nega posi zero instruction
+    //output jump
+    Not(in=nega,out=posi);
+    And(a=instruction[0],b=posi,out=j0);
+    And(a=instruction[1],b=zero,out=j1);
+    And(a=instruction[2],b=nega,out=j2);
+    Or(a=j0,b=j1,out=j01);
+    Or(a=j01,b=j2,out=jump);
 }
